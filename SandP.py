@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 from sklearn import linear_model
 from scipy import stats
+from sklearn.metrics import r2_score
 #Check the rows, columns, datatypes of the dataset
 
 df=pd.read_csv(".\sp500_companies.csv")
@@ -75,14 +76,29 @@ print('Standard Deviation=',Std)
 
 # %%
 current_price=df['Currentprice']
-MarketCap=df['Marketcap']
-slope,intercept, r, p, std_err=stats.linregress(current_price,MarketCap)
+Market_cap=df['Marketcap']
+slope,intercept, r, p, std_err=stats.linregress(current_price,Market_cap)
 print('Slope=',slope)
 print('intercept=',intercept)
 print('r=',r)
+print("p=",p)
+print("std_err=",std_err)
 
 
 
+
+
+# %% [markdown]
+# Let us check if this model is appropriate to relation between Current price and market cap.
+
+# %%
+#Polynomial Regression
+current_price=df['Currentprice']
+Market_cap=df['Marketcap']
+poly_model=np.poly1d(np.polyfit(current_price,Market_cap,3))
+print("Polynomial Regression r2 score=", r2_score(Market_cap, poly_model(current_price)))
+
+# %%
 
 
 
