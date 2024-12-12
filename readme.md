@@ -16,5 +16,7 @@ Calculate the important values of Mean, median, Mode
 
 Findings and interpretations
 Machine Learning Models
-Linear regression. Lets check if there is a positive relation between Current price and Marketcap. The low r squared valued 0.0437 indicated that marketcap may not be a strong interpreter of current price.
+Linear regression. Lets check if there is a positive relation between Current price and Marketcap. The low r squared valued 0.0437 indicated that marketcap may not be a strong interpreter of the current price.
+
+Polynomial Regression: The r2 score is 0.02 which means the polynimial regression also states that marketcap may not be a strong interpreter of the current price.
 
