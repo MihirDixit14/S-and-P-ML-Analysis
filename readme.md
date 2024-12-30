@@ -20,3 +20,7 @@ Linear regression. Lets check if there is a positive relation between Current pr
 
 Polynomial Regression: The r2 score is 0.02 which means the polynimial regression also states that marketcap may not be a strong interpreter of the current price.
 
+Predicting the market capitalization based on current price and sector using linear regression and Label Encoding.
+1.The predicted market price for the current price of 247.77 in the Consumer Defensive industry is: 117384999203
+
+Visualizing the market share distribution of the top 5 technology companies based on market capitalization sector using a pie chart.
