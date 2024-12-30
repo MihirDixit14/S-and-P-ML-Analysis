@@ -17,6 +17,9 @@ import numpy as np
 from sklearn import linear_model
 from scipy import stats
 from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
 #Check the rows, columns, datatypes of the dataset
 
 df=pd.read_csv(".\sp500_companies.csv")
@@ -87,7 +90,6 @@ print("std_err=",std_err)
 
 
 
-
 # %% [markdown]
 # Let us check if this model is appropriate to relation between Current price and market cap.
 
@@ -98,7 +100,33 @@ Market_cap=df['Marketcap']
 poly_model=np.poly1d(np.polyfit(current_price,Market_cap,3))
 print("Polynomial Regression r2 score=", r2_score(Market_cap, poly_model(current_price)))
 
+# %% [markdown]
+# Predicting the market capitalization based on current price and sector using linear regression and Label Encoding.
+
 # %%
+label_encoder=LabelEncoder()
+df['Sector']=label_encoder.fit_transform(df['Sector'])
+X=df[['Currentprice','Sector']]
+Y=df['Marketcap']
+model=linear_model.LinearRegression()
+model.fit(X,Y)
+v1=247.77
+v2=3
+
+prediction=pd.DataFrame([[v1,v2]],columns=['Currentprice','Sector'])
+prediction_ans=model.predict(prediction)
+df['Sector']=label_encoder.inverse_transform(df['Sector'])
+decoded=label_encoder.inverse_transform([v2])[0]
+print(f"The predicted market price for the current price of {v1} in the {decoded} industry is: {int(prediction_ans)}")
+
+
+# %% [markdown]
+# Visualizing the market share distribution of the top 5 technology companies based on market capitalization sector using a pie chart.
+
+# %%
+Tech_Market=df[df['Sector']=='Technology']
+top_companies=Tech_Market.nlargest(5, 'Marketcap')
+top_companies.plot(kind='pie',y='Marketcap',labels=top_companies['Shortname'], autopct='%2.2f%%', figsize=(8, 8), title="Market Share of Top Technology sector Companies")
 
 
 
