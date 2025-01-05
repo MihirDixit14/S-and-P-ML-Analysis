@@ -7,9 +7,6 @@
 #  -->
 # 
 
-# %% [markdown]
-# <!-- 1. Understanding the data set and cleaning the dataset -->
-
 # %%
 #Import all the important libraries
 import pandas as pd
@@ -20,6 +17,19 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+import xgboost as xgb
+from xgboost import XGBRegressor, DMatrix, train
+import lightgbm as lgb
+from sklearn.ensemble import RandomForestRegressor
+import plotly.express as px
+
+# %% [markdown]
+# <!-- 1. Understanding the data set and cleaning the dataset -->
+
+# %%
 #Check the rows, columns, datatypes of the dataset
 
 df=pd.read_csv(".\sp500_companies.csv")
@@ -106,12 +116,13 @@ print("Polynomial Regression r2 score=", r2_score(Market_cap, poly_model(current
 # %%
 label_encoder=LabelEncoder()
 df['Sector']=label_encoder.fit_transform(df['Sector'])
+print(df['Sector'])
 X=df[['Currentprice','Sector']]
 Y=df['Marketcap']
 model=linear_model.LinearRegression()
 model.fit(X,Y)
-v1=247.77
-v2=3
+v1=int(input('enter the current price of the share you wish to invest'))
+v2=int(input("Ener the number for sector"))
 
 prediction=pd.DataFrame([[v1,v2]],columns=['Currentprice','Sector'])
 prediction_ans=model.predict(prediction)
@@ -126,7 +137,59 @@ print(f"The predicted market price for the current price of {v1} in the {decoded
 # %%
 Tech_Market=df[df['Sector']=='Technology']
 top_companies=Tech_Market.nlargest(5, 'Marketcap')
-top_companies.plot(kind='pie',y='Marketcap',labels=top_companies['Shortname'], autopct='%2.2f%%', figsize=(8, 8), title="Market Share of Top Technology sector Companies")
+top_companies.plot(kind='pie',y='Marketcap',labels=top_companies['Shortname'], autopct='%2.2f%%', figsize=(10, 10), title="Market Share of Top Technology Companies")
+
+
+# %% [markdown]
+# This is a histogram of every sector. This shows that S and P 500 has highest investment in tech companies 
+
+# %%
+sector_counts = df['Sector'].value_counts().reset_index()
+
+sector_counts.columns = ['Sector', 'Count']
+
+# Create a histogram for the sectors
+fig = px.bar(
+    sector_counts, 
+    x='Sector', 
+    y='Count', 
+    title='Histogram of number of companies in every sector which are part of S and P', 
+    text='Count', 
+    color='Sector', 
+    labels={'Sector': 'Sector', 'Count': 'Count'}
+)
+
+
+fig.update_traces(textposition='outside')
+fig.update_layout(template='plotly_white', xaxis_title='Sector', yaxis_title='Count')
+
+fig.show()
+
+# %% [markdown]
+# XGBoost Model
+
+# %%
+X=df['Marketcap'].values.astype('int').reshape(-1, 1)
+Y=df['Currentprice'].values.astype('int').reshape(-1, 1)
+X_train, X_test, y_train, y_test = train_test_split(X,Y, test_size=0.25, random_state=0)
+xgb_train = xgb.DMatrix(X_train, y_train, enable_categorical=True)
+xgb_test = xgb.DMatrix(X_test, y_test, enable_categorical=True)
+n=50
+params={
+    'objective':'reg:squarederror',
+    'max_depth':5,
+    'learning_rate':0.1,
+}
+
+model=xgb.train(params=params, dtrain=xgb_train,num_boost_round=n)
+prediction=model.predict(xgb_test)
+
+
+mse = mean_squared_error(y_test, prediction)
+mae = mean_absolute_error(y_test, prediction)
+
+print(mse)
+print(mae)
 
 
 
